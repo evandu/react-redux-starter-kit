@@ -5,6 +5,8 @@ import { Router, useRouterHistory } from 'react-router'
 import { syncHistoryWithStore } from 'react-router-redux'
 import createStore from './store/createStore'
 import { Provider } from 'react-redux'
+import { addLocaleData, IntlProvider } from 'react-intl'
+import {lang} from './utils'
 
 const MOUNT_ELEMENT = document.getElementById('root')
 
@@ -22,16 +24,62 @@ const history = syncHistoryWithStore(browserHistory, store, {
   selectLocationState: (state) => state.router
 })
 
-let render = (key = null) => {
+// 语言设置
+const locale = lang()
+
+const startup = (key) => {
+  const localData = require(`react-intl/locale-data/${locale}`)
+  const messages = require(`./i18n/${locale}`).default
   const routes = require('./routes/index').default(store)
+  const intlData = {
+    locale: locale,
+    messages: messages
+  }
+  addLocaleData(localData)
   const App = (
     <Provider store={store}>
-      <div style={{ height: '100%' }}>
+      <IntlProvider {...intlData}>
         <Router history={history} children={routes} key={key} />
-      </div>
+      </IntlProvider>
     </Provider>
   )
   ReactDOM.render(App, MOUNT_ELEMENT)
+}
+
+// 附加中文国际化资源
+const startupWithZhLocalData = (key) => {
+  if (!global.Intl) {
+    require.ensure(['intl', 'react-intl/locale-data/zh', './i18n/zh'], (require) => {
+      require('intl')
+      startup(key, require)
+    }, 'IntlBundle')
+  } else {
+    require.ensure(['react-intl/locale-data/zh', './i18n/zh'], (require) => {
+      startup(key, require)
+    })
+  }
+}
+
+// 附加英文文国际化资源
+const startupWithEnLocalData = (key) => {
+  if (!global.Intl) {
+    require.ensure(['intl', 'react-intl/locale-data/en', './i18n/en'], (require) => {
+      require('intl')
+      startup(key, require)
+    }, 'IntlBundle')
+  } else {
+    require.ensure(['react-intl/locale-data/en', './i18n/en'], (require) => {
+      startup(key, require)
+    })
+  }
+}
+
+let render = (key = null) => {
+  if (locale === 'zh') {
+    startupWithZhLocalData(key)
+  } else {
+    startupWithEnLocalData(key)
+  }
 }
 
 // Enable HMR and catch runtime errors in RedBox
@@ -40,7 +88,6 @@ if (__DEV__ && module.hot) {
   const renderApp = render
   const renderError = (error) => {
     const RedBox = require('redbox-react')
-
     ReactDOM.render(<RedBox error={error}/>, MOUNT_ELEMENT)
   }
   render = () => {
