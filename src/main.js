@@ -27,15 +27,12 @@ const history = syncHistoryWithStore(browserHistory, store, {
 // 语言设置
 const locale = lang()
 
-const startup = (key) => {
-  const localData = require(`react-intl/locale-data/${locale}`)
-  const messages = require(`./i18n/${locale}`).default
+const startup = (key, locale, messages) => {
   const routes = require('./routes/index').default(store)
   const intlData = {
     locale: locale,
     messages: messages
   }
-  addLocaleData(localData)
   const App = (
     <Provider store={store}>
       <IntlProvider {...intlData}>
@@ -51,11 +48,17 @@ const startupWithZhLocalData = (key) => {
   if (!global.Intl) {
     require.ensure(['intl', 'react-intl/locale-data/zh', './i18n/zh'], (require) => {
       require('intl')
-      startup(key)
+      const localData = require('react-intl/locale-data/zh')
+      const messages = require('./i18n/zh').default
+      addLocaleData(localData)
+      startup(key, locale, messages)
     }, 'IntlBundle')
   } else {
     require.ensure(['react-intl/locale-data/zh', './i18n/zh'], (require) => {
-      startup(key)
+      const localData = require('react-intl/locale-data/zh')
+      const messages = require('./i18n/zh').default
+      addLocaleData(localData)
+      startup(key, locale, messages)
     })
   }
 }
@@ -65,11 +68,17 @@ const startupWithEnLocalData = (key) => {
   if (!global.Intl) {
     require.ensure(['intl', 'react-intl/locale-data/en', './i18n/en'], (require) => {
       require('intl')
-      startup(key)
+      const localData = require('react-intl/locale-data/en')
+      const messages = require('./i18n/en').default
+      addLocaleData(localData)
+      startup(key, locale, messages)
     }, 'IntlBundle')
   } else {
     require.ensure(['react-intl/locale-data/en', './i18n/en'], (require) => {
-      startup(key)
+      const localData = require('react-intl/locale-data/en')
+      const messages = require('./i18n/en').default
+      addLocaleData(localData)
+      startup(key, locale, messages)
     })
   }
 }
