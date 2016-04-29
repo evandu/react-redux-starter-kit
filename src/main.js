@@ -51,11 +51,11 @@ const startupWithZhLocalData = (key) => {
   if (!global.Intl) {
     require.ensure(['intl', 'react-intl/locale-data/zh', './i18n/zh'], (require) => {
       require('intl')
-      startup(key, require)
+      startup(key)
     }, 'IntlBundle')
   } else {
     require.ensure(['react-intl/locale-data/zh', './i18n/zh'], (require) => {
-      startup(key, require)
+      startup(key)
     })
   }
 }
@@ -65,11 +65,11 @@ const startupWithEnLocalData = (key) => {
   if (!global.Intl) {
     require.ensure(['intl', 'react-intl/locale-data/en', './i18n/en'], (require) => {
       require('intl')
-      startup(key, require)
+      startup(key)
     }, 'IntlBundle')
   } else {
     require.ensure(['react-intl/locale-data/en', './i18n/en'], (require) => {
-      startup(key, require)
+      startup(key)
     })
   }
 }
